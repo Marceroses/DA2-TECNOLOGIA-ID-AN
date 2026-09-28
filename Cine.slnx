@@ -1,0 +1,12 @@
+<Solution>
+  <Project Path="Cine.BusinessLogic.Abstractions/Cine.BusinessLogic.Abstractions.csproj" />
+  <Project Path="Cine.BusinessLogic/Cine.BusinessLogic.csproj" />
+  <Project Path="Cine.Contracts/Cine.Contracts.csproj" />
+  <Project Path="Cine.Domain/Cine.Domain.csproj" />
+  <Project Path="Cine.Mappings/Cine.Mappings.csproj" />
+  <Project Path="Cine.Repository.Abstractions/Cine.Repository.Abstractions.csproj" />
+  <Project Path="Cine.Repository/Cine.Repository.csproj" />
+  <Project Path="Cine.Tests/Cine.Tests.csproj" />
+  <Project Path="CineWebApi/CineWebApi.csproj" />
+  <Project Path="ServiceFactory/ServiceFactory.csproj" />
+</Solution>
