@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cine.Plugins.Abstractions\Cine.Plugins.Abstractions.csproj" />
+  </ItemGroup>
+
+  <!--
+    Demo en clase: este plugin NO se copia solo.
+    1. Compilar este proyecto.
+    2. Copiar bin/Debug/net10.0/Cine.Plugins.ClassicMovies.dll a CineWebApi/Plugins.
+    3. Volver a llamar GET /api/plugins, sin tocar PluginLoader ni agregar new ClassicMoviesPlugin().
+  -->
+
+</Project>

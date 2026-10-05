@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Cine</RootNamespace>
+        <DefaultItemExcludes>$(DefaultItemExcludes);Plugins\**</DefaultItemExcludes>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,6 +23,18 @@
       <ProjectReference Include="..\Cine.BusinessLogic.Abstractions\Cine.BusinessLogic.Abstractions.csproj" />
       <ProjectReference Include="..\Cine.Repository.Abstractions\Cine.Repository.Abstractions.csproj" />
       <ProjectReference Include="..\ServiceFactory\ServiceFactory.csproj" />
+      <ProjectReference Include="..\Cine.Plugins.Abstractions\Cine.Plugins.Abstractions.csproj" />
     </ItemGroup>
+
+    <Target Name="CopyPluginsToOutput" AfterTargets="Build" BeforeTargets="Run">
+        <ItemGroup>
+            <PluginDll Include="Plugins\*.dll" />
+        </ItemGroup>
+        <Copy
+            SourceFiles="@(PluginDll)"
+            DestinationFolder="$(OutputPath)Plugins"
+            SkipUnchangedFiles="true"
+            Condition="'@(PluginDll)' != ''" />
+    </Target>
 
 </Project>
