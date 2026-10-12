@@ -1,43 +1,42 @@
+using Cine.BusinessLogic.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Cine.Filters;
 
-public sealed class ApiKeyAuthenticationFilter : Attribute, IAuthorizationFilter
+public sealed class ApiKeyAuthenticationFilter(params string[] allowedRoles) : Attribute, IAuthorizationFilter
 {
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-        var token = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-
-        if (string.IsNullOrEmpty(token))
+        var token = context.HttpContext.Request.Headers.Authorization.FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(token))
         {
-            context.Result = new ObjectResult("Authorization header is needed") { StatusCode = StatusCodes.Status401Unauthorized };
+            context.Result = new ObjectResult("Authorization header is needed")
+            {
+                StatusCode = StatusCodes.Status401Unauthorized
+            };
             return;
         }
 
-        token = ExtractToken(token);
-        var sessionService = GetAuthenticationLogic(context);
-        var correctUser = sessionService.IsTokenValid(token);
-        if (!correctUser)
-        {
-            context.Result = new ObjectResult("The token does not correspond to a existing user") { StatusCode = StatusCodes.Status401Unauthorized };
-        }
-    }
+        var role = context.HttpContext.RequestServices
+            .GetRequiredService<ISessionService>()
+            .GetRole(token);
 
-    private static Cine.BusinessLogic.Abstractions.ISessionService GetAuthenticationLogic(AuthorizationFilterContext context)
-    {
-        return context.HttpContext.RequestServices.GetRequiredService<Cine.BusinessLogic.Abstractions.ISessionService>();
-    }
-
-    private static string ExtractToken(string authorizationHeader)
-    {
-        const string bearerPrefix = "Bearer ";
-        if (authorizationHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase))
+        if (role is null)
         {
-            return authorizationHeader[bearerPrefix.Length..].Trim();
+            context.Result = new ObjectResult("The token does not correspond to a existing user")
+            {
+                StatusCode = StatusCodes.Status401Unauthorized
+            };
+            return;
         }
 
-        return authorizationHeader.Trim();
+        if (!allowedRoles.Contains(role, StringComparer.OrdinalIgnoreCase))
+        {
+            context.Result = new ObjectResult("The user is not authorized for this action")
+            {
+                StatusCode = StatusCodes.Status403Forbidden
+            };
+        }
     }
 }

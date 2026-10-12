@@ -2,5 +2,5 @@ namespace Cine.BusinessLogic.Abstractions;
 
 public interface ISessionService
 {
-    bool IsTokenValid(string token);
+    string? GetRole(string token);
 }

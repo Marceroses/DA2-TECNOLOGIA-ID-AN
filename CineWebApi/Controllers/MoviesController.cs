@@ -36,6 +36,7 @@ public class MoviesController : ControllerBase
     }
 
     [HttpPost]
+    [ApiKeyAuthenticationFilter(SessionRoles.Administrador)]
     public ActionResult<MovieDto> Create([FromBody] MovieDto movieDto)
     {
         var created = _movieService.Create(movieDto.ToDomain());
@@ -54,10 +55,9 @@ public class MoviesController : ControllerBase
         return NoContent();
     }
 
-        [ApiKeyAuthenticationFilter]
-        [HttpDelete("{id:int}")]
-    
-        public IActionResult Delete([FromRoute] int id)
+    [ApiKeyAuthenticationFilter(SessionRoles.Administrador, SessionRoles.Usuario)]
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete([FromRoute] int id)
     {
         var deleted = _movieService.Delete(id);
         if (!deleted)
