@@ -6,7 +6,8 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 Movie and actor services currently return dummy arrays, so browsing lists and movie
 details does not require the backend. To reconnect, restore the commented HTTP
-imports, fields and returns in `movie-service.ts` and `actor-service.ts`, removing
+imports, fields and returns in `src/app/services/movie-service.ts` and
+`src/app/services/actor-service.ts`, removing
 the dummy arrays and returns.
 
 To start a local development server, run:

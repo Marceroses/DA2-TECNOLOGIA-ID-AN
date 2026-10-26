@@ -1,5 +1,5 @@
 import { firstValueFrom } from 'rxjs';
-import { ActorService } from '../actors/actor-service';
+import { ActorService } from './actor-service';
 import { MovieService } from './movie-service';
 
 describe('Dummy services', () => {

@@ -1,16 +1,16 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Movie } from './movie';
-import { MovieCollapse } from './movie-collapse';
-import { MovieService } from './movie-service';
+import { Movie } from '../../entities/movie';
+import { MovieCollapse } from '../movie-collapse/movie-collapse';
+import { MovieService } from '../../services/movie-service';
 
 @Component({
-  selector: 'app-movies',
+  selector: 'app-movie-list',
   imports: [RouterLink, MovieCollapse],
-  templateUrl: './movies.html',
-  styleUrl: './movies.css',
+  templateUrl: './movie-list.html',
+  styleUrl: './movie-list.css',
 })
-export class Movies implements OnInit {
+export class MovieList implements OnInit {
   private readonly movieService = inject(MovieService);
   private readonly router = inject(Router);
 

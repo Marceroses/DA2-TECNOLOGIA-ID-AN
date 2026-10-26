@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 // import { inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 // import { environment } from '../../environments/environment';
-import { Movie } from './movie';
+import { Movie } from '../entities/movie';
 
 @Injectable({ providedIn: 'root' })
 export class MovieService {

@@ -1,16 +1,16 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Actor } from './actor';
-import { ActorService } from './actor-service';
+import { Actor } from '../../entities/actor';
+import { ActorService } from '../../services/actor-service';
 
 @Component({
-  selector: 'app-actors',
+  selector: 'app-actor-list',
   imports: [RouterLink],
-  templateUrl: './actors.html',
-  styleUrl: './actors.css',
+  templateUrl: './actor-list.html',
+  styleUrl: './actor-list.css',
 })
-export class Actors implements OnInit {
+export class ActorList implements OnInit {
   private readonly actorService = inject(ActorService);
   private readonly queryParams = toSignal(inject(ActivatedRoute).queryParamMap);
 

@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Movie } from './movie';
-import { MovieService } from './movie-service';
+import { Movie } from '../../entities/movie';
+import { MovieService } from '../../services/movie-service';
 
 @Component({
   selector: 'app-movie-detail',

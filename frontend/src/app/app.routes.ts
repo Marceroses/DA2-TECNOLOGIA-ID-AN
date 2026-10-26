@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { Actors } from './actors/actors';
-import { MovieDetail } from './movies/movie-detail';
-import { Movies } from './movies/movies';
+import { ActorList } from './actors/actor-list/actor-list';
+import { MovieDetail } from './movies/movie-detail/movie-detail';
+import { MovieList } from './movies/movie-list/movie-list';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'movies', pathMatch: 'full' },
-  { path: 'movies', component: Movies },
+  { path: 'movies', component: MovieList },
   { path: 'movies/:id', component: MovieDetail },
-  { path: 'actors', component: Actors },
+  { path: 'actors', component: ActorList },
 ];
