@@ -1,0 +1,38 @@
+<h2>Películas</h2>
+
+@if (loading()) {
+  <p>Cargando...</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Título</th>
+        <th>Estrellas</th>
+        <th>Actores</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (movie of movies(); track movie.id) {
+        <tr>
+          <td>{{ movie.id }}</td>
+          <td>{{ movie.title }}</td>
+          <td>{{ movie.stars }}</td>
+          <td>
+            @for (actor of movie.actors; track actor.id; let last = $last) {
+              {{ actor.name }}{{ last ? '' : ', ' }}
+            } @empty {
+              -
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4">No hay películas.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

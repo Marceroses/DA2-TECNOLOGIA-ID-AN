@@ -8,7 +8,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
 # Plugin assemblies are copied here at build time
-CineWebApi/Plugins/*.dll
+backend/CineWebApi/Plugins/*.dll
 
 # Build results
 [Dd]ebug/
