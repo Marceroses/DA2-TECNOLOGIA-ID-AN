@@ -1,0 +1,43 @@
+<h2>Actores</h2>
+
+@if (movieId(); as id) {
+  <p class="filter">
+    Actores de <strong>{{ movieTitle() ?? ('película ' + id) }}</strong>.
+    <a routerLink="/actors">Ver todos</a>
+  </p>
+}
+
+@if (loading()) {
+  <p>Cargando...</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Nombre</th>
+        <th>Películas</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (actor of visibleActors(); track actor.id) {
+        <tr>
+          <td>{{ actor.id }}</td>
+          <td>{{ actor.name }}</td>
+          <td>
+            @for (movie of actor.movies; track movie.id; let last = $last) {
+              {{ movie.title }}{{ last ? '' : ', ' }}
+            } @empty {
+              -
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="3">No hay actores.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

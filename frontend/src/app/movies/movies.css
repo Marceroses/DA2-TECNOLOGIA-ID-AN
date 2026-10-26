@@ -13,3 +13,7 @@ td {
 .error {
   color: #b00020;
 }
+
+button:disabled {
+  opacity: 0.5;
+}
