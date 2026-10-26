@@ -1,10 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Movie } from './movie';
+import { MovieCollapse } from './movie-collapse';
 import { MovieService } from './movie-service';
 
 @Component({
   selector: 'app-movies',
+  imports: [RouterLink, MovieCollapse],
   templateUrl: './movies.html',
   styleUrl: './movies.css',
 })

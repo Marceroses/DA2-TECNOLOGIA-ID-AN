@@ -1,0 +1,19 @@
+<p><a routerLink="/movies">Volver</a></p>
+
+@if (loading()) {
+  <p>Cargando...</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (movie(); as movie) {
+  <h2>{{ movie.title }}</h2>
+  <p>Estrellas: {{ movie.stars }}</p>
+
+  <h3>Actores</h3>
+  <ul>
+    @for (actor of movie.actors; track actor.id) {
+      <li>{{ actor.name }}</li>
+    } @empty {
+      <li>Sin actores.</li>
+    }
+  </ul>
+}

@@ -19,7 +19,10 @@
       @for (movie of movies(); track movie.id) {
         <tr>
           <td>{{ movie.id }}</td>
-          <td>{{ movie.title }}</td>
+          <td>
+            <a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a>
+            <app-movie-collapse [name]="movie.title" />
+          </td>
           <td>{{ movie.stars }}</td>
           <td>
             @for (actor of movie.actors; track actor.id; let last = $last) {
