@@ -1,15 +1,13 @@
-import { HttpErrorResponse } from '@angular/common/http';
-// import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-// import { inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-// import { environment } from '../../environments/environment';
-import { Movie } from '../entities/movie';
+import { environment } from '../../../../environments/environment';
+import { Movie } from '../models/movie';
 
 @Injectable({ providedIn: 'root' })
 export class MovieService {
-  // private readonly http = inject(HttpClient);
-  // private readonly url = `${environment.apiUrl}/movies`;
+  private readonly http = inject(HttpClient);
+  private readonly url = `${environment.apiUrl}/movies`;
   private readonly movies: Movie[] = [
     {
       id: 1,
@@ -27,12 +25,14 @@ export class MovieService {
   ];
 
   getAll(): Observable<Movie[]> {
-    // return this.http.get<Movie[]>(this.url);
     return of(this.movies);
   }
 
+  getAllFromApi(): Observable<Movie[]> {
+    return this.http.get<Movie[]>(this.url);
+  }
+
   getById(id: number): Observable<Movie> {
-    // return this.http.get<Movie>(`${this.url}/${id}`);
     const movie = this.movies.find((movie) => movie.id === id);
     return movie
       ? of(movie)

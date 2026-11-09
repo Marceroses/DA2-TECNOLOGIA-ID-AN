@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Actor } from '../../entities/actor';
+import { Actor } from '../../models/actor';
 import { ActorService } from '../../services/actor-service';
 
 @Component({

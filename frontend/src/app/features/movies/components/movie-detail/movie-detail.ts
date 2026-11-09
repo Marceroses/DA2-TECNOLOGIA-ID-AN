@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Movie } from '../../entities/movie';
+import { Movie } from '../../models/movie';
 import { MovieService } from '../../services/movie-service';
 
 @Component({

@@ -1,0 +1,78 @@
+<h2>Catálogo de películas</h2>
+
+<section aria-labelledby="catalog-heading">
+  <h3 id="catalog-heading">Películas disponibles</h3>
+  <p>Consultá las películas de la API. El listado principal y los actores usan datos de ejemplo.</p>
+  <button type="button" (click)="loadFromApi()" [disabled]="loading()">Consultar películas</button>
+
+  @if (loading()) {
+    <p role="status">Cargando...</p>
+  }
+  @if (error(); as message) {
+    <p role="alert">{{ message }}</p>
+  }
+  @if (apiMovies(); as movies) {
+    <p>Películas recibidas: {{ movies.length }}</p>
+    <ul>
+      @for (movie of movies; track movie.id) {
+        <li>{{ movie.title }}</li>
+      } @empty {
+        <li>La API respondió sin películas.</li>
+      }
+    </ul>
+  }
+</section>
+
+<section aria-labelledby="api-token-heading">
+  <h3 id="api-token-heading">Token para la API</h3>
+  <p>Es opcional y se mantiene solo en memoria. Es independiente del acceso simulado a actores.</p>
+  <form (ngSubmit)="saveToken(tokenInput)">
+    <label for="api-token">Token de la API</label>
+    <input id="api-token" #tokenInput type="password" autocomplete="off" required />
+    <button type="submit">Guardar token</button>
+  </form>
+  <p role="status">
+    {{ apiToken.token() ? 'Token cargado en memoria.' : 'No hay token cargado.' }}
+  </p>
+  @if (tokenError(); as message) {
+    <p role="alert">{{ message }}</p>
+  }
+  <button type="button" (click)="clearToken()" [disabled]="!apiToken.token()">Quitar token</button>
+</section>
+
+<section aria-labelledby="actors-access-heading">
+  <h3 id="actors-access-heading">Acceso simulado a actores</h3>
+  <p>
+    Probá el acceso al listado de actores con una sesión de prueba. Usá
+    <strong>demo / demo</strong>; no ingreses credenciales reales. La sesión solo vive en memoria y
+    no protege datos del backend. La sección Actores sigue siendo pública.
+  </p>
+  <p>Sesión: {{ session.signedIn() ? 'iniciada' : 'cerrada' }}</p>
+  <form #loginForm="ngForm" (ngSubmit)="signIn()">
+    <label for="demo-username">Usuario de prueba</label>
+    <input id="demo-username" name="username" [(ngModel)]="username" required />
+    <label for="demo-password">Contraseña de prueba</label>
+    <input
+      id="demo-password"
+      name="password"
+      type="password"
+      [(ngModel)]="password"
+      required
+      autocomplete="off"
+    />
+    <button type="submit" [disabled]="loginForm.invalid || session.signedIn()">
+      Simular inicio de sesión
+    </button>
+  </form>
+  @if (signInError(); as message) {
+    <p role="alert">{{ message }}</p>
+  }
+  <button type="button" (click)="session.signOut()" [disabled]="!session.signedIn()">
+    Cerrar sesión simulada
+  </button>
+  <p><a routerLink="/catalog/actors">Ver actores con acceso simulado</a></p>
+
+  @if (queryParams()?.get('acceso') === 'denegado' && !session.signedIn()) {
+    <p role="status">Acceso denegado. Primero simulá un inicio de sesión.</p>
+  }
+</section>

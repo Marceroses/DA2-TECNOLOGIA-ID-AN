@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Movie } from '../../entities/movie';
+import { Movie } from '../../models/movie';
 import { MovieCollapse } from '../movie-collapse/movie-collapse';
 import { MovieService } from '../../services/movie-service';
 
