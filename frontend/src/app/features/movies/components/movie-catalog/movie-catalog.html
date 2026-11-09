@@ -23,31 +23,14 @@
   }
 </section>
 
-<section aria-labelledby="api-token-heading">
-  <h3 id="api-token-heading">Token para la API</h3>
-  <p>Es opcional y se mantiene solo en memoria. Es independiente del acceso simulado a actores.</p>
-  <form (ngSubmit)="saveToken(tokenInput)">
-    <label for="api-token">Token de la API</label>
-    <input id="api-token" #tokenInput type="password" autocomplete="off" required />
-    <button type="submit">Guardar token</button>
-  </form>
-  <p role="status">
-    {{ apiToken.token() ? 'Token cargado en memoria.' : 'No hay token cargado.' }}
-  </p>
-  @if (tokenError(); as message) {
-    <p role="alert">{{ message }}</p>
-  }
-  <button type="button" (click)="clearToken()" [disabled]="!apiToken.token()">Quitar token</button>
-</section>
-
 <section aria-labelledby="actors-access-heading">
-  <h3 id="actors-access-heading">Acceso simulado a actores</h3>
+  <h3 id="actors-access-heading">Inicio de sesión simulado</h3>
   <p>
-    Probá el acceso al listado de actores con una sesión de prueba. Usá
-    <strong>demo / demo</strong>; no ingreses credenciales reales. La sesión solo vive en memoria y
-    no protege datos del backend. La sección Actores sigue siendo pública.
+    Usá <strong>demo / demo</strong> e ingresá un token de prueba para la API. El token se guarda en
+    sessionStorage y la sesión simulada no protege datos del backend. La sección Actores sigue
+    siendo pública; no ingreses credenciales reales.
   </p>
-  <p>Sesión: {{ session.signedIn() ? 'iniciada' : 'cerrada' }}</p>
+  <p>Sesión: {{ auth.signedIn() ? 'iniciada' : 'cerrada' }}</p>
   <form #loginForm="ngForm" (ngSubmit)="signIn()">
     <label for="demo-username">Usuario de prueba</label>
     <input id="demo-username" name="username" [(ngModel)]="username" required />
@@ -60,19 +43,28 @@
       required
       autocomplete="off"
     />
-    <button type="submit" [disabled]="loginForm.invalid || session.signedIn()">
+    <label for="api-token">Token de la API</label>
+    <input
+      id="api-token"
+      name="token"
+      type="password"
+      [(ngModel)]="token"
+      required
+      autocomplete="off"
+    />
+    <button type="submit" [disabled]="loginForm.invalid || auth.signedIn()">
       Simular inicio de sesión
     </button>
   </form>
   @if (signInError(); as message) {
     <p role="alert">{{ message }}</p>
   }
-  <button type="button" (click)="session.signOut()" [disabled]="!session.signedIn()">
+  <button type="button" (click)="auth.signOut()" [disabled]="!auth.signedIn()">
     Cerrar sesión simulada
   </button>
   <p><a routerLink="/catalog/actors">Ver actores con acceso simulado</a></p>
 
-  @if (queryParams()?.get('acceso') === 'denegado' && !session.signedIn()) {
+  @if (queryParams()?.get('acceso') === 'denegado' && !auth.signedIn()) {
     <p role="status">Acceso denegado. Primero simulá un inicio de sesión.</p>
   }
 </section>

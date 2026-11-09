@@ -6,7 +6,7 @@ import { Movie } from '../models/movie';
 
 @Injectable({ providedIn: 'root' })
 export class MovieService {
-  private readonly http = inject(HttpClient);
+private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/movies`;
   private readonly movies: Movie[] = [
     {

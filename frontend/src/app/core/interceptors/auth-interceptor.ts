@@ -2,13 +2,13 @@ import { DOCUMENT } from '@angular/common';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { ApiTokenService } from '../services/api-token-service';
+import { AuthService } from '../services/auth-service';
 
 const apiUrl = new URL(environment.apiUrl);
 const apiPath = apiUrl.pathname.replace(/\/+$/, '');
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
-  const token = inject(ApiTokenService).token();
+  const token = inject(AuthService).getToken();
   if (!token || request.headers.has('Authorization')) {
     return next(request);
   }

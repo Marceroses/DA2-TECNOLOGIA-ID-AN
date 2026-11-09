@@ -3,8 +3,7 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ApiTokenService } from '../../../../core/services/api-token-service';
-import { DemoSession } from '../../../../core/services/demo-session';
+import { AuthService } from '../../../../core/services/auth-service';
 import { Movie } from '../../models/movie';
 import { MovieService } from '../../services/movie-service';
 
@@ -17,36 +16,40 @@ export class MovieCatalog {
   private readonly movieService = inject(MovieService);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly session = inject(DemoSession);
-  protected readonly apiToken = inject(ApiTokenService);
+  protected readonly auth = inject(AuthService);
   protected readonly queryParams = toSignal(inject(ActivatedRoute).queryParamMap);
   protected readonly apiMovies = signal<Movie[] | null>(null);
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly signInError = signal<string | null>(null);
-  protected readonly tokenError = signal<string | null>(null);
   protected username = '';
   protected password = '';
-
-  protected saveToken(input: HTMLInputElement): void {
-    const saved = this.apiToken.setToken(input.value);
-    input.value = '';
-    this.tokenError.set(
-      saved
-        ? null
-        : 'Ingresá un token ASCII sin espacios ni caracteres de control; el token anterior no cambió.',
-    );
-  }
-
-  protected clearToken(): void {
-    this.apiToken.clear();
-    this.tokenError.set(null);
-  }
+  protected token = '';
 
   protected signIn(): void {
-    const success = this.session.signIn(this.username.trim(), this.password);
-    this.password = '';
-    this.signInError.set(success ? null : 'Usuario o contraseña de prueba incorrectos.');
+    try {
+      const success = this.auth.signIn(this.username.trim(), this.password, this.token);
+      this.signInError.set(
+        success
+          ? null
+          : 'Revisá el usuario, la contraseña y el token: usá demo/demo y un token ASCII sin espacios.',
+      );
+    } catch (error) {
+      if (
+        !(error instanceof DOMException) ||
+        (error.name !== 'SecurityError' && error.name !== 'QuotaExceededError')
+      ) {
+        throw error;
+      }
+
+      console.error('No se pudo guardar la sesión en sessionStorage.', error);
+      this.signInError.set(
+        'No se pudo guardar la sesión. Revisá los permisos o el espacio del navegador.',
+      );
+    } finally {
+      this.password = '';
+      this.token = '';
+    }
   }
 
   protected loadFromApi(): void {

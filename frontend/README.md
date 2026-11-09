@@ -72,7 +72,7 @@ src/app/
 └── app.ts
 ```
 
-`core` reúne la guarda, el interceptor y los servicios compartidos de sesión y token; cada funcionalidad agrupa sus propios componentes, modelos y servicios. El layout principal contiene el encabezado, la navegación y el espacio para mostrar cada página. [`shared`](src/app/shared/) queda preparada para componentes de UI reutilizables; por ahora no contiene componentes.
+`core` reúne la guarda, el interceptor y el servicio de sesión; cada funcionalidad agrupa sus propios componentes, modelos y servicios. El layout principal contiene el encabezado, la navegación y el espacio para mostrar cada página. [`shared`](src/app/shared/) queda preparada para componentes de UI reutilizables; por ahora no contiene componentes.
 
 ## 3. Conectar con el backend: HttpClient y observables
 
@@ -121,14 +121,17 @@ Angular prueba las rutas en orden. Si agregás una ruta comodín `**` para una p
 ## 5. Guardas y sesión simulada
 
 1. En **Catálogo**, intentá abrir **Ver actores con acceso simulado** con la sesión cerrada: volvés al catálogo y aparece **Acceso denegado**.
-2. Ingresá `demo` como usuario y `demo` como contraseña, presioná **Simular inicio de sesión** y abrí el enlace otra vez: ahora se muestra la lista. Son valores públicos de ejemplo: no ingreses credenciales reales.
-3. Volvé a **Catálogo**, cerrá la sesión simulada e intentá entrar nuevamente.
+2. Ingresá `demo` como usuario y `demo` como contraseña, junto con un token de prueba para la API. Presioná **Simular inicio de sesión** y abrí el enlace otra vez: ahora se muestra la lista. Son valores públicos de ejemplo: no ingreses credenciales reales.
+3. Recargá la página: la sesión continúa mientras siga abierta la pestaña.
+4. Volvé a **Catálogo**, cerrá la sesión simulada e intentá entrar nuevamente. El token también se elimina.
 
-El formulario de [`movie-catalog.html`](src/app/features/movies/components/movie-catalog/movie-catalog.html) utiliza `ngModel` y `ngSubmit` mediante `FormsModule`. [`demo-session.ts`](src/app/core/services/demo-session.ts) comprueba únicamente esos valores públicos y mantiene el estado en memoria; al recargar la página se pierde. [`demo-session.guard.ts`](src/app/core/guards/demo-session.guard.ts) devuelve `true` para permitir la navegación o un `UrlTree` para redirigir:
+Para las operaciones protegidas de la API podés usar uno de los tokens de ejemplo definidos en [`SessionService.cs`](../backend/Cine.BusinessLogic/SessionService.cs).
+
+El formulario de [`movie-catalog.html`](src/app/features/movies/components/movie-catalog/movie-catalog.html) utiliza `ngModel` y `ngSubmit` mediante `FormsModule`. [`AuthService`](src/app/core/services/auth-service.ts) comprueba los valores de ejemplo y guarda el token ingresado con `sessionStorage.setItem(SESSION_TOKEN_KEY, cleanToken)`. Al recargar, recupera el estado desde ese mismo almacenamiento; al cerrar sesión elimina la clave. [`demo-session.guard.ts`](src/app/core/guards/demo-session.guard.ts) devuelve `true` para permitir la navegación o un `UrlTree` para redirigir:
 
 ```typescript
 export const demoSessionGuard: CanActivateFn = () => {
-  if (inject(DemoSession).signedIn()) {
+  if (inject(AuthService).signedIn()) {
     return true;
   }
 
@@ -140,14 +143,29 @@ export const demoSessionGuard: CanActivateFn = () => {
 
 La ruta normal `/actors` sigue siendo pública. `CanActivate` controla la entrada; `CanDeactivate` puede confirmar la salida de un formulario; un resolver carga datos antes de activar la ruta.
 
-**Importante:** esto no es autenticación real y no se emite ningún token. Una guarda controla la navegación, pero no protege datos ni operaciones; el backend debe autenticar y verificar permisos. `localStorage` conserva datos entre sesiones y `sessionStorage` dura hasta cerrar la pestaña, pero ambos son accesibles desde JavaScript. Para una sesión real, evaluá con el backend el almacenamiento seguro, incluyendo riesgos de XSS y CSRF.
+**Importante:** esto no es autenticación real: el inicio simulado no emite ni valida el token contra el backend. Una guarda controla la navegación, pero no protege datos ni operaciones; el backend debe autenticar y verificar permisos. `sessionStorage` sobrevive a las recargas de la pestaña, pero es accesible desde JavaScript y vulnerable a XSS. Para una sesión real, evaluá con el backend el almacenamiento seguro, incluyendo riesgos de XSS y CSRF.
 
 ## 6. Interceptor de autorización
 
-Un interceptor recibe las peticiones realizadas con `HttpClient` antes de enviarlas. En [`auth-interceptor.ts`](src/app/core/interceptors/auth-interceptor.ts), `authInterceptor` consulta [`ApiTokenService`](src/app/core/services/api-token-service.ts) y, si hay un token, clona la petición inmutable para agregar `Authorization`. Después la entrega a `next()`, sin modificar la respuesta ni ocultar errores:
+Un interceptor recibe las peticiones realizadas con `HttpClient` antes de enviarlas. En [`auth-interceptor.ts`](src/app/core/interceptors/auth-interceptor.ts), `authInterceptor` obtiene el token de `sessionStorage` mediante `AuthService` y, si existe, clona la petición inmutable para agregar `Authorization`. Después la entrega a `next()`, sin modificar la respuesta ni ocultar errores:
 
 ```typescript
-return next(isApiRequest ? request.clone({ setHeaders: { Authorization: token } }) : request);
+const apiUrl = new URL(environment.apiUrl);
+const apiPath = apiUrl.pathname.replace(/\/+$/, '');
+
+export const authInterceptor: HttpInterceptorFn = (request, next) => {
+  const token = inject(AuthService).getToken();
+  if (!token || request.headers.has('Authorization')) {
+    return next(request);
+  }
+
+  const url = new URL(request.url, inject(DOCUMENT).baseURI);
+  const isApiRequest =
+    url.origin === apiUrl.origin &&
+    (url.pathname === apiPath || url.pathname.startsWith(`${apiPath}/`));
+
+  return next(isApiRequest ? request.clone({ setHeaders: { Authorization: token } }) : request);
+};
 ```
 
 Para que Angular lo use, se registra en [`app.config.ts`](src/app/app.config.ts):
@@ -163,8 +181,8 @@ El token se agrega solo a la URL de la API configurada en `environment.ts` y sus
 Para verlo en acción:
 
 1. Iniciá el frontend y el backend como se explicó arriba.
-2. En **Catálogo**, ingresá un token de prueba en **Token de la API** y presioná **Guardar token**. El campo se limpia y el token queda solo en memoria.
+2. En **Catálogo**, ingresá `demo`, `demo` y un token de prueba en el formulario de inicio de sesión. El campo del token se limpia y el valor queda en `sessionStorage` bajo la clave `cine.apiToken`.
 3. Abrí las herramientas de desarrollador del navegador, pestaña **Red / Network**, y presioná **Consultar películas**. En la solicitud a `/api/movies`, revisá la cabecera `Authorization`.
-4. Presioná **Quitar token** y repetí la consulta: la cabecera ya no aparece.
+4. Presioná **Cerrar sesión simulada** y repetí la consulta: la cabecera ya no aparece.
 
-La sesión simulada de actores es independiente y no genera ni elimina el token de la API. Al recargar la página, el token en memoria se pierde. `GET /api/movies` es público, por lo que recibir un 200 no demuestra que el token sea válido; el backend comprueba la autorización en las operaciones protegidas. Usá tokens de prueba, no los guardes en el repositorio ni los compartas en capturas, y usá HTTPS para credenciales reales.
+El token permanece al recargar y se elimina al cerrar la sesión o normalmente al cerrar la pestaña. `GET /api/movies` es público, por lo que recibir un 200 no demuestra que el token sea válido; el backend comprueba la autorización en las operaciones protegidas. Usá tokens de prueba, no los guardes en el repositorio ni los compartas en capturas, y usá HTTPS para credenciales reales.

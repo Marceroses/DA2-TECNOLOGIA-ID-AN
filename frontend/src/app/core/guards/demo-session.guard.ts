@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { DemoSession } from '../services/demo-session';
+import { AuthService } from '../services/auth-service';
 
 export const demoSessionGuard: CanActivateFn = () => {
-  if (inject(DemoSession).signedIn()) {
+  if (inject(AuthService).signedIn()) {
     return true;
   }
 
