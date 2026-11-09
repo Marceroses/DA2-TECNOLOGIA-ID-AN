@@ -47,6 +47,7 @@ src/app/
 │   ├── guards/
 │   ├── interceptors/
 │   └── services/
+├── shared/
 ├── features/
 │   ├── actors/
 │   │   ├── components/actor-list/
@@ -71,7 +72,7 @@ src/app/
 └── app.ts
 ```
 
-`core` reúne la guarda, el interceptor y los servicios compartidos de sesión y token; cada funcionalidad agrupa sus propios componentes, modelos y servicios. El layout principal contiene el encabezado, la navegación y el espacio para mostrar cada página. Todavía no hay componentes de UI compartidos, por lo que `shared` puede agregarse cuando sea necesario.
+`core` reúne la guarda, el interceptor y los servicios compartidos de sesión y token; cada funcionalidad agrupa sus propios componentes, modelos y servicios. El layout principal contiene el encabezado, la navegación y el espacio para mostrar cada página. [`shared`](src/app/shared/) queda preparada para componentes de UI reutilizables; por ahora no contiene componentes.
 
 ## 3. Conectar con el backend: HttpClient y observables
 
